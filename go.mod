@@ -29,7 +29,7 @@ require (
 	github.com/oschwald/geoip2-golang v1.9.0
 	github.com/pierrec/lz4/v4 v4.1.19
 	github.com/prometheus/client_golang v1.18.0
-	github.com/quic-go/quic-go v0.40.1
+	github.com/quic-go/quic-go v0.42.0
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/shirou/gopsutil/v3 v3.23.11
 	github.com/syncthing/notify v0.0.0-20210616190510-c6b7342338d2
@@ -38,14 +38,14 @@ require (
 	github.com/urfave/cli v1.22.14
 	github.com/vitrun/qart v0.0.0-20160531060029-bf64b92db6b0
 	github.com/willabides/kongplete v0.3.0
-	golang.org/x/crypto v0.17.0
+	golang.org/x/crypto v0.21.0
 	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc
-	golang.org/x/net v0.19.0
-	golang.org/x/sys v0.15.0
+	golang.org/x/net v0.23.0
+	golang.org/x/sys v0.18.0
 	golang.org/x/text v0.14.0
 	golang.org/x/time v0.5.0
 	golang.org/x/tools v0.16.1
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
@@ -79,7 +79,6 @@ require (
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
-	github.com/quic-go/qtls-go1-20 v0.4.1 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
