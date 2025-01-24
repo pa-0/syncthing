@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"github.com/d4l3k/messagediff"
+	"github.com/thejerf/suture/v4"
+
 	"github.com/syncthing/syncthing/lib/assets"
 	"github.com/syncthing/syncthing/lib/build"
 	"github.com/syncthing/syncthing/lib/config"
@@ -46,7 +48,6 @@ import (
 	"github.com/syncthing/syncthing/lib/sync"
 	"github.com/syncthing/syncthing/lib/tlsutil"
 	"github.com/syncthing/syncthing/lib/ur"
-	"github.com/thejerf/suture/v4"
 )
 
 var (
@@ -444,7 +445,9 @@ func TestAPIServiceRequests(t *testing.T) {
 // testHTTPRequest tries the given test case, comparing the result code,
 // content type, and result prefix.
 func testHTTPRequest(t *testing.T, baseURL string, tc httpTestCase, apikey string) {
-	timeout := time.Second
+	// Since running tests in parallel, the previous 1s timeout proved to be too short.
+	// https://github.com/syncthing/syncthing/issues/9455
+	timeout := 10 * time.Second
 	if tc.Timeout > 0 {
 		timeout = tc.Timeout
 	}
