@@ -4,18 +4,24 @@ on:
   push:
     branches:
       - infrastructure
+      - infra-*
 
 env:
-  GO_VERSION: "~1.21.5"
+  GO_VERSION: "~1.23.0"
   CGO_ENABLED: "0"
   BUILD_USER: docker
   BUILD_HOST: github.syncthing.net
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   docker-syncthing:
     name: Build and push Docker images
+    if: github.repository == 'syncthing/syncthing'
     runs-on: ubuntu-latest
-    environment: docker
+    environment: release
     strategy:
       matrix:
         pkg:
@@ -39,6 +45,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build binaries
         run: |
           for arch in arm64 amd64; do
@@ -49,6 +62,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Set Docker tags (all branches)
+        run: |
+          tags=docker.io/syncthing/${{ matrix.pkg }}:${{ github.sha }},ghcr.io/syncthing/infra/${{ matrix.pkg }}:${{ github.sha }}
+          echo "TAGS=$tags" >> $GITHUB_ENV
+
+      - name: Set Docker tags (latest)
+        if: github.ref == 'refs/heads/infrastructure'
+        run: |
+          tags=docker.io/syncthing/${{ matrix.pkg }}:latest,ghcr.io/syncthing/infra/${{ matrix.pkg }}:latest,${{ env.TAGS }}
+          echo "TAGS=$tags" >> $GITHUB_ENV
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -56,6 +80,6 @@ jobs:
           file: ./Dockerfile.${{ matrix.pkg }}
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: syncthing/${{ matrix.pkg }}:latest,syncthing/${{ matrix.pkg }}:${{ github.sha }}
+          tags: ${{ env.TAGS }}
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}

@@ -262,12 +262,22 @@ func versionerFsFromFolderCfg(cfg config.FolderConfiguration) (versionsFs fs.Fil
 	folderFs := cfg.Filesystem(nil)
 	if cfg.Versioning.FSPath == "" {
 		versionsFs = fs.NewFilesystem(folderFs.Type(), filepath.Join(folderFs.URI(), DefaultPath))
-	} else if cfg.Versioning.FSType == fs.FilesystemTypeBasic && !filepath.IsAbs(cfg.Versioning.FSPath) {
-		// We only know how to deal with relative folders for basic filesystems, as that's the only one we know
+	} else if cfg.Versioning.FSType == config.FilesystemTypeBasic {
+		// Expand any leading tildes for basic filesystems,
+		// before checking for absolute paths.
+		path, err := fs.ExpandTilde(cfg.Versioning.FSPath)
+		if err != nil {
+			path = cfg.Versioning.FSPath
+		}
+		// We only know how to deal with relative folders for
+		// basic filesystems, as that's the only one we know
 		// how to check if it's absolute or relative.
-		versionsFs = fs.NewFilesystem(cfg.Versioning.FSType, filepath.Join(folderFs.URI(), cfg.Versioning.FSPath))
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(folderFs.URI(), path)
+		}
+		versionsFs = fs.NewFilesystem(cfg.Versioning.FSType.ToFS(), path)
 	} else {
-		versionsFs = fs.NewFilesystem(cfg.Versioning.FSType, cfg.Versioning.FSPath)
+		versionsFs = fs.NewFilesystem(cfg.Versioning.FSType.ToFS(), cfg.Versioning.FSPath)
 	}
 	l.Debugf("%s (%s) folder using %s (%s) versioner dir", folderFs.URI(), folderFs.Type(), versionsFs.URI(), versionsFs.Type())
 	return
